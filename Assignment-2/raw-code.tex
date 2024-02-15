@@ -154,10 +154,11 @@ getting a red number on the next spin exists, is unique, and equals $\frac{
 Classical Probability, as indicated, is accurately captured by the formula:
 \[ P(E) = \frac{\text{Number of outcomes favorable to } E}{\text{Total number of equally likely outcomes}} \]
 where \textcolor{blue}{\(P(E)\)} denotes the probability of an event \textcolor{blue}{\(E\)}, specifically, the event of obtaining a red number in the context of this discussion.
-In adherence to the problem's premises, the count of outcomes favorable to event \textcolor{blue}{\(E\)} remains \textcolor{blue}{\(18\)}, while the total count of outcomes, characterized by the number of slots on the roulette wheel, is stipulated as \textcolor{blue}{\(36\)}.
+In adherence to the problem's premises, the count of outcomes favorable to event \textcolor{blue}{\(E\)} remains \textcolor{blue}{\(18\)}, while the total count of outcomes, characterized by the number of slots on the roulette wheel, is stipulated as \textcolor{blue}{\(38\)}.
 Thus, the application of the classical probability framework yields the probability of event \textcolor{blue}{\(E\)} as:
-\[ \textcolor{brown}{P(E) = \frac{18}{36}} \]
-The classical interpretation of probability asserts the equitability of outcomes within a finite sample space. Consequently, considering the inherent fairness of the roulette wheel and the finite nature of its sample space encompassing \textcolor{blue}{\(38\)} slots, the probability \textcolor{blue}{\(P(E)\)} signifies the frequency of red number occurrences (\textcolor{blue}{\(18\)}) relative to the entirety of feasible outcomes (\textcolor{blue}{\(38\)}) as \textcolor{blue}{\(18/36\)}.
+\[ \textcolor{brown}{P(E) = \frac{18}{38}} \] \\
+Indeed, in a scenario where all outcomes are equiprobable, each outcome has a probability of \( \frac{1}{\text{total number of possibilities}} \), which, in this case, is \( \frac{1}{38} \). Therefore, given that there are 18 red outcomes out of 38 total possibilities, the probability of obtaining a red outcome is \( \frac{18}{38} \). \\ \\
+The classical interpretation of probability asserts the equitability of outcomes within a finite sample space. Consequently, considering the inherent fairness of the roulette wheel and the finite nature of its sample space encompassing \textcolor{blue}{\(38\)} slots, the probability \textcolor{blue}{\(P(E)\)} signifies the frequency of red number occurrences (\textcolor{blue}{\(18\)}) relative to the entirety of feasible outcomes (\textcolor{blue}{\(38\)}) as \textcolor{blue}{\(18/38\)}.
 }
 \item[(B)]
 
@@ -167,13 +168,14 @@ $\frac{ 18 }{ 38 }$.
 
 \textbf{\textcolor{brown}{True}} \\
 \textcolor{blue}{Within the frequentist interpretation of probability, the essence lies in determining the probability of an event based on its long-run frequency of occurrence under identical conditions.\\
-Given the fairness of the roulette wheel, where each of the \textcolor{blue}{\(38\)} possible outcomes (slots on the wheel) possesses an equal chance of occurring on any given spin, and assuming the process is repeated infinitely, this fairness assumption aligns with the frequentist approach. Specifically, it entails calculating that, in an infinitely long series of spins, the relative frequency of landing on a red number (of which there are \textcolor{blue}{\(18\)}) compared to all potential outcomes (\textcolor{blue}{\(38\)} in total) will converge towards \textcolor{blue}{\(18/36\)}.}
+Given the fairness of the roulette wheel, where each of the \textcolor{blue}{\(38\)} possible outcomes (slots on the wheel) possesses an equal chance of occurring on any given spin, and assuming the process is repeated infinitely, this fairness assumption aligns with the frequentist approach. Specifically, it entails calculating that, in an infinitely long series of spins, the relative frequency of landing on a red number (of which there are \textcolor{blue}{\(18\)}) compared to all potential outcomes (\textcolor{blue}{\(38\)} in total) will converge towards \textcolor{blue}{\(18/38\)}.}
 
     
 \item[(C)]
 
 Repeat (A) and (B) but removing the assumption that the wheel-spinning is fair, and not replacing it with any other assumption about the nature of the data-generating process (taking the outcomes of the wheel spins as data). \\ 
     \textcolor{brown}{\textbf{False}}
+    \\ \textcolor{blue}{If the wheel exhibits bias, the likelihood of each possible outcome varies, rendering the assumption of equal likelihood invalid.} 
 \subsection*{\textcolor{blue}{\textbf{Regarding (A)}}}
 \textcolor{blue}{
 In the typical scenario, we assert that each number holds an equal likelihood of occurrence. Thus, given \textcolor{blue}{\(18\)} red numbers out of a total of \textcolor{blue}{\(38\)}, the probability of obtaining a red number is computed as \(\frac{18}{38}\).\\
@@ -194,6 +196,7 @@ You're observing a binary data stream, and You have sampling model $[ SM ]$ unce
 \textcolor{brown}{\textbf{False}}
 
 \textcolor{blue}{
+In the context of inferring about parameter θ, the essential variables required for inference are solely (n, s), where n represents the number of trials conducted, and s denotes the sum of successful trials. Consequently, once the value of s has been computed, the detailed data vector y becomes superfluous for the purpose of inference.\\ \\
 In the context of inferring parameter $\theta$, the vector $(n, s)$ stands as a sufficient source of information, particularly when considering iid (independent and identically distributed) Bernoulli trials. This assertion finds its roots in the principle of sufficiency in statistics, which dictates that $(n, s)$ embodies all essential details required for accurate $\theta$ estimation. This principle aligns well with the inherent properties of the Bernoulli distribution, where the likelihood of observing the data given $\theta$ can be fully encapsulated by $(n, s)$.
 \\
 Conversely, the exclusion of the detailed data vector $y = (y_1, ..., y_n)$ doesn't result in any loss of critical information for $\theta$ prediction, provided strict adherence to the iid assumption in Bernoulli trials. However, it's paramount to acknowledge the pivotal role played by the data vector $y$ in validating the model and scrutinizing assumptions.
@@ -242,18 +245,10 @@ on $( 0, 1 )$ are realizable by single members of this family.
 \textcolor{blue}{In scenarios where the distribution exhibits multiple peaks or is multimodal, the approach may encounter limitations as it may not adequately capture all the peaks.
 \\
 The Beta distribution is a versatile tool in statistics, characterized by two positive parameters, $\alpha$ and $\beta$, enabling it to simulate various forms within the interval $(0, 1)$. Its flexibility allows it to influence symmetric, skewed, and even U-shaped distributions, making it particularly valuable in Bayesian statistics when modeling probabilities or proportions.
-\\
-The shape of the Beta distribution is determined by its parameters:
-\begin{itemize}
-    \item If $\alpha = \beta > 1$, the distribution is symmetric and centered at 0.5.
-    \item When $\alpha > \beta$ or $\alpha < \beta$, the distribution skews to the right or left, respectively.
-    \item For $\alpha, \beta < 1$, the distribution becomes U-shaped, indicating a preference for values near 0 and 1. This feature is beneficial for predicting extreme outcomes rather than moderate ones.
-    \item If $\alpha = \beta = 1$, the Beta distribution becomes a uniform distribution on $(0, 1)$, indicating no preference for any value within the interval.
-\end{itemize}
-\\
+\\ \\
+It won’t be able to do it since there might be more than one peak. \\ \\
 The ability of the Beta distribution to encapsulate various interpretations of the outcome in a prior distribution makes it a valuable tool in Bayesian analysis, especially in modeling binomial proportions or parameters confined to the interval $(0, 1)$.
 }
-
 
 
 \item[(G)]
@@ -266,12 +261,13 @@ The notion that there is only one method to specify each component of a model (p
 bution, probability model, evidence, and utility) in each given problem is false. In practice,
 subjective decisions based on several sources of information, theoretical considerations, and
 practical constraints frequently influence the definition of these components, particularly the
-prior distribution and likelihood model.
+prior distribution and likelihood model. \\ \\ 
+In many instances, determining parameters can appear straightforward, although such occurrences are infrequent. These values are influenced by a multitude of factors, including prior knowledge, assumptions inherent in distribution modeling, subjective judgment, characteristics of the data, the methodology employed for data collection, and other such considerations. Consequently, parameter determination is not a uniform process and may vary based on the individual conducting the analysis. \\ \\
 The available background information determines the previous distribution and is subjective.
 Several valid priors indicate differing prior knowledge or ignorance about the parameter under
 consideration. While specific models may show a natural alternative for the likelihood func-
 tion, in many circumstances, numerous models are available for the data creation process,
-and the choice of these models can significantly influence the inference.
+and the choice of these models can significantly influence the inference. \\ \\
 The evidence calculation, frequently used in Bayesian model comparison, is more important
 than the statement suggests. Evidence computation necessitates integration across all possible
 parameter values, which can be complicated and reliant on the models and priors used.
@@ -293,7 +289,10 @@ B_b )$ (in which $b$ is a finite positive integer), You should try hard not to c
 
 \textcolor{blue}{When developing an uncertainty assessment, it is critical to avoid conditioning on incorrect assumptions to ensure validity. Conditioning on false assertions can result in logical errors and erroneous probability assignments since it effectively assigns a probability of zero to that branch of the sample space, which violates probability principles. This is similar to attempting to estimate the chance of an impossible, fundamentally useless event.}
 
-\textcolor{blue}{For example, suppose the assertion "It is snowing" is known to be false. In that case, conditioning on it might result in a nonsensical probability assignment for rain-dependent events, such as outdoor activities.}
+\textcolor{blue}{For example, suppose the assertion "It is snowing" is known to be false. In that case, conditioning on it might result in a nonsensical probability assignment for rain-dependent events, such as outdoor activities.
+\\ \\
+The intersection of sets \( A \) and \( B \), denoted as \( A \cap B \), yields the empty set \( \emptyset \), resulting in \( P(B_i) = 0 \). Consequently, the conditional probability becomes \( P(A | B_i) = \frac{P(A \cap B_i)}{P(B_i)} = \frac{0}{0} \), which evaluates to zero.
+}
 
 
 \item[(I$^*$)]
@@ -307,7 +306,7 @@ can differ along any of those three dimensions.\\
 \textcolor{brown}{\textbf{True}} \\
 \textcolor{blue}{The statement holds validity as achieving complete objectivity in probability analysis frequently proves elusive. This challenge arises due to the inherent subjectivity ingrained within the process, influenced by the assessors' assumptions, judgments, and prior knowledge. Variability in probability assessments stems from individuals harboring distinct beliefs, making diverse judgments, and possessing disparate background information. Consequently, the evaluation of probabilities inevitably reflects the subjective perspectives and interpretations of the assessors, underscoring the intricate interplay between subjectivity and objectivity within probabilistic reasoning.}
 
-\textcolor{blue}{For example, let's analyze the probability of rain tomorrow. One individual may evaluate the chance using meteorological data, while another may use past weather trends or intuition, resulting in differing conclusions.}
+\textcolor{blue}{For example, let's analyze the probability of rain tomorrow. One individual may evaluate the chance using meteorological data, while another may use past weather trends or intuition, resulting in differing conclusions. \\ \\ Individuals may hold varying sets of assumptions, influencing their assessments differently. While many may claim impartiality, such neutrality is often unattainable. Evidence can be construed diversely, yielding disparate outcomes. Given the distinct background knowledge possessed by individuals, all assertions in the statement hold true.}
 
 
 \item[(J)]
