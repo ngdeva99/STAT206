@@ -1,0 +1,657 @@
+\documentclass[12pt]{article}
+
+\usepackage{ amsmath, amssymb, graphicx, psfrag, bm, multirow, hyperref, mathbbol }
+\usepackage[ dvipsnames ]{ xcolor }
+
+\addtolength{\textheight}{2.0in}
+\addtolength{\topmargin}{-1.15in}
+\addtolength{\textwidth}{1.825in}
+\addtolength{\evensidemargin}{-1.0in}
+\addtolength{\oddsidemargin}{-1.0in}
+\setlength{\parskip}{0.1in}
+\setlength{\parindent}{0.0in}
+
+\raggedbottom
+
+\renewcommand\labelitemi{\color{blue} $\blacktriangleright$}
+
+\newcommand{\given}{\, | \,}
+ 
+\newcommand{\bi}[1]{\b{\i{#1}}}
+\renewcommand{\b}[1]{\textbf{#1}}
+\renewcommand{\i}[1]{\textit{#1}}
+\renewcommand{\r}[1]{\text{#1}}
+\renewcommand{\t}[1]{\texttt{#1}}
+\renewcommand{\u}[1]{\underline{#1}}
+
+\begin{document}
+
+\begin{flushleft}
+
+Prof.~David Draper \\
+Department of Statistics \\
+University of California, Santa Cruz \\
+Winter 2024
+
+\end{flushleft}
+
+\Large
+
+\begin{center}
+
+\textbf{\large STAT 206: Quiz 2 \textit{[300 total points]}}
+
+\end{center}
+
+\normalsize
+
+As a small part of a study I worked on at the RAND Corporation in the late 1980s, we obtained data on a simple random sample (SRS) of $n = 14$ women who came to a hospital in
+Santa Monica, CA, in 1988 to give birth to premature babies. One outcome of interest was
+the length of stay (LoS) $y_i$ in the hospital that woman $i$ in this sample experienced, recorded as an integer; it was possible for this variable to be recorded as 0 if the LoS was under 12 hours. The data values were as follows: 
+
+\begin{center}
+
+$\bm{ y } = ( y_1, \dots, y_n ) = ( 1, 2, 1, 1, 4, 1, 2, 2, 0, 3, 6, 2, 1, 3 )$.
+
+\end{center}
+
+The unknown $\theta$ of principal interest in this problem is the mean LoS in the population $\mathcal{ P } =$ \{all U.S.~women giving birth around the year 1988 who were similar to the women in the RAND sample in all relevant ways\}; the size $N$ of this population is so much larger than the sample size $n$ that IID sampling and SRS are similar, so that we can use our IID formulas in this problem. 
+
+In most of this case study, as we did in Take-Home Test 1 problem (II)(B), we'll employ the \bi{cheating} approach to sampling model $[SM]$ specification, by using the data both to specify the $[SM]$ and to draw inferences conditional on the data-driven choice; at the end of the problem we'll look at the frequentist bootstrap as an approximate Bayesian inferential method that avoids cheating entirely.
+
+I've written some \t{R} code to guide You through this analysis: it's in the file called 
+\begin{center}
+
+\t{stat-206-quiz-2-code-file-R.txt} 
+
+\end{center}
+in the \t{Pages} tab of the course \t{Canvas} pages. It's divided up into \t{Code Blocks}, referenced below (You're of course free, as usual, to code in a different data science software environment if You wish).
+
+\begin{itemize}
+
+\item[(a)]
+
+Study \fbox{\t{Code Block 1}}. When You run it, You'll need to make two changes: to the \t{setwd} function call, so that graphics files created by running the code are exported to the right place in Your file system, and to the \t{pdf} function call, to do the exporting. I recommend that You stop at every comment (denoted by the hashtag character \t{\#}) before running the function call that follows it, to ensure that You understand what the \t{R} code is doing.
+
+Use \fbox{\t{Code Block 1}} to make a histogram of the observed data values (include this in Your solutions), and describe the basic shape of this distribution. \bi{[10 points]}
+
+\includegraphics[ scale = 0.75 ]{histogram-1.png}
+
+
+{\color{blue} \textbf{Solution:}
+The histogram derived from Code Block 1 illustrates the Probability Mass Function (PMF) of a discrete random variable spanning values from 0 to 6. Evident in the graph is a notable skewness inherent to the random PMF. Discerning the modal value, it becomes apparent that 1 emerges with the highest probability of occurrence, a characteristic prominently depicted. The transition from 0 to 1 showcases a sharp ascent, contrasting with the subsequent descent observed from 2 to 5, wherein the probability reaches a nadir owing to the absence of occurrences for the value 5. Notably, a minor spike is discernible at 6. Given the non-negative integer nature of the data set, the Poisson distribution emerges as the most suitable probabilistic model for representation.
+}
+\end{itemize}
+
+One possible sampling model $[SM]$ for non-negative integer-valued variables is the \i{\u{Po}isson} distribution $[ SM \colon \! \r{Po} ]$ with mean $\theta > 0$: You could take the $( Y_i \given [ SM \colon \! \r{Po} ] \, \theta \, \mathcal{ B } )$ as conditionally IID Poisson$( \theta )$, where the marginal sampling distribution for observation $i$ would then be
+\begin{equation} \label{e:poisson-1}
+P ( Y_i = y_i \given [ SM \colon \! \r{Po} ] \, \theta \, \mathcal{ B } ) = \left\{ \begin{array}{cc} \frac{ \theta^{ y_i } \, e^{ - \theta } }{ y_i ! } & \textrm{for } y_i = 0, 1, \dots \\ 0 & \textrm{otherwise} \end{array} \right\} \, .
+\end{equation}
+
+\begin{itemize}
+
+\item[(b)]
+
+Verify that, if the Poisson distribution is parameterized in this way, $\theta$ is indeed the mean of this distribution; in other words, show that if $( Y_i \given [ \textrm{SM} \colon \! \r{Po} ] \, \theta \, \mathcal{ B } ) \stackrel{ \textrm{\footnotesize IID} }{ \sim }$ Poisson$( \theta )$ then $E ( Y_i \given [ SM \colon \! \r{Po} ] \, \theta \, \mathcal{ B } ) = \theta$. \bi{[10 points]}
+
+
+
+{\color{blue} \textbf{Answer:}
+\begin{equation}
+P ( Y_i = y_i \given [ SM \colon \! \r{Po} ] \, \theta \, \mathcal{ B } ) = \left\{ \begin{array}{cc} \frac{ \theta^{ y_i } \, e^{ - \theta } }{ y_i ! } & \textrm{for } y_i = 0, 1, \dots \\ 0 & \textrm{otherwise} \end{array} \right\} \, .
+\end{equation}
+
+We know that the mean, $\theta = 2.071429$ (from R code)
+
+So the formula becomes,
+
+\textbf{Empirical Calculations:}
+
+* $P(Y_i = 0) = \frac{1}{14} \approx 0.071$
+
+* $P(Y_i = 1) = \frac{5}{14} \approx 0.357$
+
+* $P(Y_i = 2) = \frac{4}{14} \approx 0.286$
+
+* $P(Y_i = 3) = \frac{2}{14} \approx 0.143$
+
+* $P(Y_i = 4) = \frac{1}{14} \approx 0.071$
+
+* $P(Y_i = 5) = \frac{0}{14} = 0$
+
+* $P(Y_i = 6) = \frac{1}{14} \approx 0.071$
+
+* $P(Y_i \ge 7) = \frac{0}{14} = 0$
+
+\textbf{Best-Fitting Poisson Calculations:}
+
+* $P(Y_i = 0) = \frac{ 2.0714^{ 0 } \, e^{ - 2.0714 } }{ 0 ! }  \approx 0.126$
+
+* $P(Y_i = 1) = \frac{ 2.0714^{ 1 } \, e^{ - 2.0714 } }{ 1 ! }  \approx 0.261$
+
+* $P(Y_i = 2) = \frac{ 2.0714^{ 2 } \, e^{ - 2.0714 } }{ 2 ! }  \approx 0.270$
+
+* $P(Y_i = 3) = \frac{ 2.0714^{ 3 } \, e^{ - 2.0714 } }{ 3 ! }  \approx 0.187$
+
+* $P(Y_i = 4) = \frac{ 2.0714^{ 4 } \, e^{ - 2.0714 } }{ 4 ! }  \approx 0.097$
+
+* $P(Y_i = 5) = \frac{ 2.0714^{ 5 } \, e^{ - 2.0714 } }{ 5 ! }  \approx 0.040$
+
+* $P(Y_i = 6) = \frac{ 2.0714^{ 6 } \, e^{ - 2.0714 } }{ 6 ! }  \approx 0.014$
+
+* $P(Y_i = 7) = \frac{ 2.0714^{ 7 } \, e^{ - 2.0714 } }{ 7 ! }  \approx 0.004$
+
+* $P(Y_i = 8) = \frac{ 2.0714^{ 8 } \, e^{ - 2.0714 } }{ 8 ! }  \approx 0.001$
+
+* $P(Y_i = 9) = \frac{ 2.0714^{ 9 } \, e^{ - 2.0714 } }{ 9 ! }  \approx 0.0002$
+
+* $P(Y_i = 10) = \frac{ 2.0714^{ 10 } \, e^{ - 2.0714 } }{ 10 ! }  \approx 0.000050504$
+
+* $P(Y_i = 11) = \frac{ 2.0714^{ 11 } \, e^{ - 2.0714 } }{ 11 ! }  \approx 0.00000951$
+
+Due to the diminishing probability associated with values further from the mean, it is reasonable to disregard the probabilities for values exceeding 11.
+
+$P(Y_i \ge 7) \approx P(Y_i = 7) + P(Y_i = 8) + P(Y_i = 9) + P(Y_i = 10) + P(Y_i = 11) \approx 0.00545$
+
+Expectation, \[E ( Y_i = y_i \given [ SM \colon \! \r{Po} ] \, \theta \, \mathcal{ B } ) =  \sum_{n=0}^{\infty} P(Y_i = y_i) * y_i \]
+
+\[= (0.126*0) + (0.261*1) + (0.270*2) + (0.187*3) + (0.097*4) + (0.040*5) + (0.014*6) + (0.004*7) \]
+\[+ (0.001*8) + (0.0002*9) + (0.00005*10) + (0.000000951*11) \approx 2.0714 \]	
+
+We can see that we get the same expectation as from empirical data. Hence, the proof.
+
+
+
+}
+
+
+\item[(c)]
+
+\bi{[40 total points in this part of the Quiz]} Likelihood inference, part 1:
+
+\begin{itemize}
+
+\item[(i)]
+
+Work out the likelihood and log likelihood functions in this $[SM]$ with this data
+set, and use \fbox{\t{Code Block 2}} to plot them for $\theta$ from 0.5 to 3.75; include the plots in Your solutions document. \bi{[10 points]}
+
+{\color{blue}\textbf{Solution:}
+The log likelihood function for poisson distribution is the product of all individual probabilites.
+
+$L(\theta) = \prod_{i=1}^{n}\frac{ \theta^{ y_i } \, e^{ - \theta } }{ y_i ! }$
+
+Since the factorial doesn't depend on $\theta$, we take that as a constant c+ and place it outside.
+
+$L(\theta) = c_{+}\prod_{i=1}^{n}\theta^{ y_i } \, e^{ - \theta } $
+
+
+$L(\theta) = c_{+} * exp(-n*\theta)* \theta^s$
+
+where $s = \sum_{i=1}^{n}y_i$ is the sum of the vector
+
+
+Log likelihood function is $log(L(\theta)) = log(c_{+} * exp(-n*\theta)* \theta^s)$
+
+$= log(c_{+}) - n\theta + slog(\theta)$
+
+Log likelihood function, $log(L(\theta)), =c_{real} + s.log(\theta) - n.\theta$
+
+The log likelihood function for a Poisson distribution involves the product of individual probabilities, where each probability is calculated using the Poisson probability mass function. By simplifying the expression and recognizing that the factorial term is constant with respect to \( \theta \), it can be factored out. This leads to a simpler form of the likelihood function, making it easier to handle and analyze.
+
+The resulting expression involves terms dependent on \( \theta \) and the sum of the observed values. Taking the logarithm of this likelihood function yields a more manageable equation for computation and analysis.
+
+\includegraphics[ scale = 0.75 ]{Screenshot 2024-02-22 at 10.34.55 PM.png}
+
+}
+\item[(ii)]
+
+How close are these functions in this small-sample case to the Gaussian behavior You'd expect (on Bayesian grounds) in large samples? \bi{[10 points]}
+
+{\color{blue} \textbf{Solution:} 
+The behavior of the likelihood function bears resemblance to a Gaussian distribution, particularly in larger sample sizes, but it exhibits some skewness at the extremes. Interpreting the likelihood function as an approximation of the posterior distribution, assuming a flat or minimally informative prior, suggests that the Bayes interval will be asymmetric around the maximum likelihood estimate (MLE). It tends to extend a bit further to the right than to the left, indicating a slight asymmetry. This observation highlights potential limitations of the frequentist approach in this scenario. }
+\item[(iii)]
+
+Show that $s \triangleq \sum_{ i = 1 }^n y_i$ is sufficient (along with $n$) for $\theta$ in this sampling model, and that the maximum-likelihood estimator $\hat{ \theta }_{ MLE }$ of $\theta$ is $\bar{ y } = \frac{ s }{ n }$. \bi{[20 points]}
+
+{\color{blue} \textbf{Answer:}
+In this sampling model, the pair \((n, s)\) is sufficient for estimating \(\theta\), as the log likelihood function for all observed values \(y_i\) can be computed solely using \(n\) and \(s\). Since the log likelihood function exhibits unimodal behavior, meaning it has only one peak, calculus techniques can be employed to determine the maximum likelihood estimate (MLE).
+
+By taking the derivative of the log likelihood function with respect to \(\theta\) and setting it to zero, we find the critical point:
+
+\[ \frac{\partial (\text{ll}(\theta|y_i))}{\partial\theta} = 0 \]
+
+This simplifies to:
+
+\[ \frac{s}{\theta} - n = 0 \]
+
+Solving for \(\theta\), we find:
+
+\[ \theta = \frac{s}{n} \]
+
+Thus, the MLE of \(\theta\) is given by:
+
+\[ \hat{\theta}_{\text{MLE}} = \frac{s}{n} \]
+
+}
+\end{itemize}
+
+
+\item[(d)]
+
+\bi{[20 total points in this part of the Quiz]} To get an informal idea of whether the Poisson $[SM]$ fits this data set reasonably well:
+
+\begin{itemize}
+
+\item[(i)] 
+
+Run \fbox{\t{Code Block 3}} and complete Table \ref{t:poisson-fit-1} , including the completed table in Your solutions document. In this table, the empirical $\hat{ P } ( Y_i = y_i \given \mathcal{ B } )$ values are just the observed relative frequencies, and the best-fitting Poisson values are obtained by computing probabilities from the Poisson distribution with $\theta = \hat{ \theta }_{ MLE }$. \bi{[10 points]}
+
+\includegraphics[ scale = 0.75 ]{d-i.png}
+
+{\color{blue} \textbf{Answer: Refer Table}}
+\begin{table}[t!]
+
+\centering
+
+\caption{\textit{A comparison of the empirical relative frequencies in the LoS case study with the corresponding best-fitting Poisson probabilities.}}
+
+\bigskip
+{\color{blue}
+\begin{tabular}{c||c|c}
+
+& \multicolumn{2}{c}{$\hat{ P } ( Y_i = y_i \given \mathcal{ B } )$} \\ \cline{2-3}
+
+& & Best-Fitting \\
+
+$y_i$ & Empirical & Poisson \\
+
+
+
+\hline
+
+0 & 0.071 & \textbf{0.126}\\
+
+1 & \textbf{0.357} & \textbf{0.261} \\
+
+2 & \textbf{0.286} & \textbf{0.270}\\
+
+3 & \textbf{0.143} & \textbf{0.187}\\
+
+4 & \textbf{0.071} & \textbf{0.097}\\
+
+5 & \textbf{0} & \textbf{0.040}\\
+
+6 & \textbf{0.071} & \textbf{0.014}\\
+
+$\ge 7$ & \textbf{0} & \textbf{0.00545}\\
+
+\hline
+
+Total & \textbf{1} & \textbf{0.999998}
+
+\end{tabular}
+}
+
+\label{t:poisson-fit-1}
+
+\end{table}
+
+\item[(ii)] 
+
+Informally, does the fit look reasonably good to You? Explain briefly. \bi{[10 points]}
+
+{\color{blue} \textbf{Answer:}
+
+In an informal assessment, the performance seems somewhat promising. However, due to the small size of the dataset, there is a higher risk of errors. The fit appears relatively good around the mean. For instance, when the observed value is 2, the empirical probability is 0.286, which is quite close to the calculated probability of 0.270 from the Poisson sampling. Nevertheless, as observations move further away from the mean, the likelihood of errors increases. For instance, when the observed value is 6, the empirical probability drops to 0.071, while the Poisson sampling yields a probability of 0.014. Overall, we can tentatively conclude that the two distributions exhibit some similarity, but caution should be exercised, especially when dealing with values far from the mean. }
+\end{itemize}
+
+\item[(e)]
+
+\bi{[20 total points in this part of the Quiz]} Another informal check on the Poisson $[ SM ]$:
+
+\begin{itemize}
+
+\item[(i)] 
+
+Verify that in this model $\theta$ is also the variance of the Poisson distribution. \bi{[10 points]}
+{\color{blue}
+
+\textbf{Claim: } if $f(Y_i | [SM: Po] \theta B) \sim Poisson(\theta)$ then, 
+
+$V(Y_i | [SM: Po] \theta B) = \theta$, having already shown that
+
+$E(Y_i | [SM: Po] \theta B) = \theta$
+
+\textbf{Proof: } Variance of a distribution is 
+
+\begin{equation}
+    Var(Y_i) = E(Y_i^2) - (E(Y_i))^2
+\end{equation}
+
+
+$E(Y_i) = \sum_{y_i = 0}^{\infty} y_i . \frac{e^{-\theta}. \theta^{y_i}}{y!}$
+$= \theta$ (From Wolfram Alpha)
+
+$E(Y^2_i) = \sum_{y_i = 0}^{\infty} y^2_i . \frac{e^{-\theta}. \theta^{y_i}}{y!} = \theta. (\theta + 1) = \theta^2 + \theta$  (From Wolfram Alpha)
+
+Substituting the above values in eqn (3) , we get
+
+$Var(Y_i) = \theta^2 + \theta - \theta^2 = \theta$
+Q.E.D
+
+
+}
+\item[(ii)] 
+
+Use (i) and the output of \fbox{\t{Code Block 1}} to create another informal check on the Poisson sampling model. \bi{[10 points]}
+
+{\color{blue}
+Based on the findings from part (i), we observe that the sample variance (\(V(Y_i) = \theta\)) equals the sample mean (\(E(Y_i)\)). The maximum likelihood estimate (\(\hat{\theta}_{MLE}\)), which equals the sample mean (\(\bar{y}\)) computed as 2.071, supports this observation. Additionally, the sample variance is calculated to be 2.379.
+
+Comparing the variance-to-mean ratio (VTMR), computed as \(\frac{2.379}{2.071} \approx 1.15\), we find that it falls within an acceptable tolerance range. Therefore, although the values are not identical, they are sufficiently close. Hence, we characterize the relationship as a "best-fit" rather than a "perfect-fit."
+
+In statistical terms, this implies a meaningful correspondence between the observed data and the Poisson distribution, although not an exact match.
+
+}
+\end{itemize}
+
+
+
+
+
+
+\item[(f)]
+
+\bi{[30 total points in this part of the Quiz]} To explore the quality of fit of the Poisson $[SM]$ graphically, Figure \ref{f:figure-1} presents a Poisson probability plot (PPP) of the LoS data (the solid blue-green curve), along with two kinds of calibration information: the Poisson target (the dotted straight line in maroon), and 10,000 PPPs created by taking random samples of size $n = 14$ from the Poisson distribution with $\theta = \hat{ \theta }_{ MLE }$ and adding their PPPs to the graph in gray (this plot may take some time to load in Your PDF reader). (If You wish (not required as part of Your solutions), You can experiment with the \t{R} code that created this Figure using \fbox{\t{Code Block 4}} .)
+
+\begin{itemize}
+
+\item[(i)]
+
+Does the Poisson probability plot of the data follow the target line reasonably well? Explain briefly. \bi{[10 points]}
+
+{\color{blue} Yes, In my opinion, the Poisson probability plot of the data closely adheres to the target line. The data points along the blue-green line, representing the observed data, exhibit differences of no more than 1 compared to the corresponding Poisson target at any given quantile value depicted in the graph. This indicates a satisfactory alignment between the observed data and the expected Poisson distribution.
+}
+
+\includegraphics[ scale = 0.75 ]{pic.png}
+\item[(ii)]
+
+Is the PPP of the data comfortably within the uncertainty bands for samples of size $n = 14$? Explain briefly. \bi{[10 points]}
+
+{\color{blue} Yes, In my Bayesian perspective, I find that the Poisson probability plot of the data falls comfortably within the uncertainty bands suitable for samples of size \( n = 14 \). All data points along the blue-green line, symbolizing the observed data vector, reside comfortably within the grey envelope delineating the tolerance bands of Poisson variation. This indicates that our observed values are well-contained within the acceptable range of uncertainty.
+
+}
+\item[(iii)]
+
+Looking at Your answers to (d), (e), (f)(i), and (f)(ii), in Your judgment is the Poisson $[SM]$ a reasonably good assumption upon which to condition in this case study? Explain briefly. \bi{[10 points]}
+
+{\color{blue} Yes, I would argue that the assumption of a Poisson distribution is a reasonable choice for conditioning this case study, based on several factors highlighted in questions (d), (e), (f)(i), and (f)(ii).
+
+- Upon visual inspection, the probability values for each element appear to exhibit a good fit.
+- The calculated values adhere to the constraints expected in a Poisson distribution, where the mean equals the variance, and the maximum likelihood estimate (\(\hat{\theta}_{MLE}\)) is satisfied.
+- The plotted graph illustrates that the Poisson probability plot of the data vector aligns reasonably well with the target line.
+- Additionally, the data vector comfortably resides within the uncertainty bands typically associated with samples of size \(n = 14\).
+
+These observations collectively suggest that the assumption of a Poisson distribution adequately captures the underlying characteristics of the dataset.
+
+}
+\end{itemize}
+
+\end{itemize}
+
+So far we've been using the cheating (using the data twice) approach to $[ SM ]$ specification, in which we've used the entire data set to see if the off-the-shelf Poisson $[ SM ]$ seems to provide a good fit. We'll now continue this cheating approach until part ($\ell$), when we'll use a (frequentist and Bayesian) nonparametric method that estimates the $[ SM ]$ and $\theta$ simultaneously.
+
+\begin{itemize}
+
+\item[(g)]
+
+\bi{[20 total points in this part of the Quiz]} Likelihood inference, part 2: Run \fbox{\t{Code Block 5}} and study the results.
+
+\begin{itemize}
+
+\item[(i)]
+
+Compute a large-sample standard error for $\hat{ \theta }_{ MLE }$ using observed information; show Your mathematical work and use the appropriate quantities from the \t{R} output. \bi{[10 points]}
+
+\textcolor{blue}{\textbf{Solution in below images from g, h, i, j, k}}
+
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{g-i.png}
+
+
+% {\color{Bittersweet}
+
+% $P(y_i|[SM: Po] \theta B) = \frac{\theta^{y_i}. e^{-\theta}}{y_i!}$
+
+% $L(\theta) = c_{+} * exp(-n*\theta)* \theta^s$
+
+% $log(L(\theta)), =c_{real} + s.log(\theta) - n.\theta$
+
+% $\hat{\theta}_{MLE} = \frac{s}{n} = \Bar{y}$
+
+% $\frac{\partial (ll(\theta|y_i))}{\partial\theta} = \frac{s}{\theta} - n$
+
+% $\frac{\partial^2 (ll(\theta|y_i))}{\partial\theta^2} = -\frac{s}{\theta^2}$
+
+% When $ \theta = \hat{\theta}_{MLE} = \frac{s}{n}$
+
+% $\frac{\partial^2 (ll(\theta|y_i))}{\partial\theta^2} = -\frac{s}{(\frac{s}{n})^2}$
+
+% $\frac{\partial^2 (ll(\theta|y_i))}{\partial\theta^2} = -\frac{n^2}{s}$
+
+% $-\frac{\partial^2 (ll(\theta|y_i))}{\partial\theta^2} = \frac{n^2}{s} = \frac{n}{\hat{\theta}_{MLE}} = \hat{I}(\hat{\theta}_{MLE})$
+
+% $\hat{SE} = \frac{1}{\sqrt{\hat{I}(\hat{\theta}_{MLE})}} = \sqrt{\frac{\hat{\theta}_{MLE}}{n}}$
+
+% Substituting values for n = 14 and $\hat{\theta}_{MLE} = 2.071429$, we get
+% $\hat{SE} = 0.38465$
+% }
+
+
+
+\item[(ii)]
+
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{g-ii.png}
+
+
+\end{itemize}
+
+\item[(h)]
+
+Show that the conjugate prior model $[ PM ]$ family for $\theta$ in the Poisson sampling model is the family of Gamma distributions $\Gamma ( \alpha, \beta )$: for $\alpha > 0$ and $\beta > 0$,
+\begin{equation} \label{e:poisson-2}
+p ( \theta \given [ PM \colon \! \Gamma ] \, \alpha \, \beta \, \mathcal{ B } ) = c_+ \, \theta^{ \alpha - 1 } \, e^{ - \beta \, \theta } \, ,
+\end{equation}
+in which $c_+$ is a positive normalizing constant (as far as $\theta$ is concerned). \bi{[10 points]}
+
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{h-i.png}
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{h-ii.png}
+
+
+\item[(i$^*$)]
+
+Show that the conjugate updating rule in this model is
+\begin{eqnarray} \label{e:updating-1}
+\left\{ \begin{array}{c} ( \theta \given [ PM \! : \! \Gamma ] \, \mathcal{ B } ) \sim \Gamma ( \alpha, \beta ) \\ ( Y_i \given [ SM \colon \! \r{Po} ] \, \theta \, \mathcal{ B } ) \stackrel{ \mbox{\tiny IID} }{ \sim } \textrm{Poisson} ( \theta ) \\ ( i = 1, \dots, n ) \end{array} \right\} \Longrightarrow \nonumber \\ ( \theta \given \bm{ y } \, [ PM \! : \! \Gamma ] \, \alpha \, \beta \, [ SM \colon \! \r{Po} ] \, \mathcal{ B } ) \sim \Gamma ( \alpha + s, \beta + n ) \, ,
+\end{eqnarray}
+in which $[ \textrm{PM:} \, \Gamma ]$ refers to the conjugate prior modeling [PM] assumption and $s$ (along with $n$) is sufficient for $\theta$ (as is also true, of course, in the likelihood story). \bi{[10 points]}
+
+\centering
+    \includegraphics[width=0.5\linewidth]{i-1.png}
+
+\centering
+    \includegraphics[width=0.5\linewidth]{i-2.png}
+
+\item[(j)]
+
+With the parameterization of the Gamma distribution in (h), it turns out that
+\begin{equation} \label{e:poisson-4}
+\textrm{if} \ \ \ ( \theta \given \Gamma \, \alpha \, \beta ) \sim \Gamma ( \alpha, \beta ) \ \ \ \textrm{then} \ \ \ E ( \theta \given \Gamma \, \alpha \, \beta ) = \frac{ \alpha }{ \beta } \ \ \ \textrm{and} \ \ \ V ( \theta \given \Gamma \, \alpha \, \beta ) = \frac{ \alpha }{ \beta^2 } \, .
+\end{equation}
+Use the mean expression in equation (\ref{e:poisson-4}) to show that the posterior mean is a weighted average of the prior mean and the sample mean, in which the prior mean gets $\beta$ votes and the sample mean gets $n$ votes; this identifies the prior sample size in this model as $n_0 = \beta$. \bi{[10 points]}
+
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{j.png}
+
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{j-ii.png}
+
+\item[(k)]
+
+\bi{[50 total points in this part of the Quiz]} Suppose --- as was true in the RAND investigation --- that before this study was conducted, not much was known external to
+the data set about $\theta$; this suggests a low-information (LI) prior in which the prior sample size $\beta$ is small, say $\beta = \epsilon$ for some small positive $\epsilon$ such as $\epsilon = 0.01$. The next (and final) specification task is to choose $\alpha$ (having set $\beta = \epsilon$) to obtain a reasonable LI prior. 
+
+\begin{itemize}
+
+\item[(i)]
+
+One idea, which is a version of using the data twice that in practice has essentially no actual downside, is to choose $\alpha$ so that the prior mean agrees with the data mean $\bar{ y }$. Having already set $\beta = \epsilon$, show that this corresponds to the choice $\alpha = \epsilon \cdot \bar{ y }$. \bi{[10 points]}
+
+\item[(ii)]
+
+By comparing Your expression for the likelihood function in part (c)(i) with the Gamma family of PDFs, show that the likelihood, when considered as an un-normalized PDF for $\theta$, corresponds to the $\Gamma ( s + 1, n )$ distribution. \bi{[10 points]}
+
+\item[(iii)]
+
+Run \fbox{\t{Code Block 6}} to plot the prior, likelihood and posterior PDFs, for $\theta$ from 0.5 to 3.75, on the same graph, using the prior in (i) and the data set given in this problem; include this graph in Your solutions. (\textit{Hint:} Be careful with the parameterization of the Gamma distribution in Your software: ensure that it matches equation (\ref{e:poisson-2}) above.) \bi{[10 points]}
+
+\item[(iv)]
+
+Does Your plot in (iii) indicate that we have indeed specified a $[ LI ]$ prior? Is the relationship between the likelihood and posterior PDFs approximately what You expected, given the prior model in (i)? \bi{[10 points]}
+
+\textcolor{blue}{\textbf{The solution of J \beta/\beta+n .. would be available on start of Page 12}}
+
+\item[(v)]
+
+Compute the posterior mean and SD (to get the posterior SD, use the variance expression in (\ref{e:poisson-4})) and report them. \bi{[10 points]}
+
+\item[(vi)]
+
+Use the \texttt{qgamma} function in \texttt{R} (or some other numerical integration software of Your choosing) to compute a 99.9\% posterior interval for $\theta$. \bi{[10 points]}
+
+\end{itemize}
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{k-i.png}
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{k-i-ii.png}
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{k-iii.png}
+
+\centering
+    \includegraphics[width=0.5\linewidth]{graph-k-iii.png}
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{k-iii-iv.png}
+
+\centering
+    \includegraphics[width=0.5\linewidth]{k-v.png}
+
+    \centering
+    \includegraphics[width=0.5\linewidth]{k-vi.png}
+
+
+\item[($\ell$)]
+
+\bi{[30 total points in this part of the Quiz]} Next, let's (I) use the frequentist bootstrap as an approximate Bayesian nonparametric inferential method and (II) compare the three approaches examined here. Run \fbox{\t{Code Block 7}} and examine the results. 
+
+\begin{table}[t!]
+
+\centering
+
+\caption{\textit{A comparison of three inferential methods in the LoS case study.}}
+
+\bigskip
+
+\begin{tabular}{c||c|c|c|c}
+
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{2}{c}{99.9\% Interval} \\ \cline{4-5}
+
+\multicolumn{1}{c}{Method} & \multicolumn{1}{c}{Estimate} & \multicolumn{1}{c}{SE/SD} & \multicolumn{1}{c}{Lower} & Upper \\
+
+\hline
+
+Large--$n$ Likelihood & 2.0715 & 0.38465 & 0.8057 & 3.3371 \\
+
+\hline
+
+Bayes With $[LI]$ Prior & 2.0714 & 0.38452 & 1.03396 & 3.574023 \\
+
+\hline
+
+\begin{tabular}{c} Frequentist Bootstrap of \\ Sample Mean (Approximate \\
+$[LI]$--Prior Bayes) \end{tabular} & 2.0719 & 0.39694 & 1.0000 & 3.571429
+
+\end{tabular}
+
+\label{t:inferential-comparison}
+
+\end{table}
+
+\begin{itemize}
+
+\item[(i)]
+
+Consider the histogram of the bootstrap sample means, with the Bayesian posterior PDF for $\theta$ with a $[LI]$ prior model superimposed (You don't need to include this plot in Your solutions). Apart from the apparent anomaly near $( \theta = 2 )$, which is an artifact of \t{R}'s default choice of histogram bars, would You say that the bootstrap has successfully sampled (in a roundabout manner) from the posterior? Explain briefly. \bi{[10 points]}
+
+\textcolor{blue}{The bootstrap technique has effectively sampled from a distribution that closely resembles the Bayesian posterior, as evidenced by the strong agreement between the bootstrap mean and the sample mean of the original dataset. This implies that, under specific conditions, the bootstrap method can serve as a valuable nonparametric approximation to Bayesian posterior distributions.
+\\
+This analysis demonstrates that the frequentist bootstrap has the potential to offer a practical approximation to the Bayesian posterior, particularly in situations where direct Bayesian computation is challenging or when a nonparametric approach is favored.}
+
+\item[(ii)]
+
+Draw together all relevant numerical results obtained so far in this Quiz by completing Table \ref{t:inferential-comparison} (filling in all of the --- entries), explaining in each case in which part of this problem the numerical values came from. \bi{[10 points]}
+\textcolor{blue}{\textbf{Solution in Table..}}
+
+\item[(iii)]
+
+Are the three inferential methods examined here in substantial agreement with each other? If so, briefly explain why; if not, briefly explain why not. \bi{[10 points]}
+
+\textcolor{blue}{Although there are slight differences, the three inferential methods—frequentist bootstrap, sample mean approximation, and prior Bayes—generally show consistency. While their confidence intervals may differ, there is substantial overlap, indicating that any methodological variations are minor and do not substantially affect overall agreement, particularly when dealing with large sample sizes. This suggests that the selection of strategy may not be crucial for large datasets, as all three methods yield comparable results.}
+
+\end{itemize}
+
+\item[(m)]
+
+\bi{[20 total points in this part of the Quiz]} Next, let's performing a posterior predictive cross-validation check of the Poisson $[ SM ]$ using the LOO (Leave One Out) method. Run \fbox{\t{Code Block 8}} and examine the results. 
+
+\begin{itemize}
+
+\item[(i)]
+
+Are the mean and SD of the predictive $z$--values close to their target values under perfect calibration? Explain briefly. \bi{[10 points]}
+
+\textcolor{blue}{The predictive z-values exhibit a mean of approximately 0.031 and a standard deviation (SD) of around 1.155. In an ideally calibrated scenario, we anticipate the mean of predictive z-values to be near 0, indicating unbiased predictions on average, while the SD should be close to 1, signifying a well-calibrated predictive model.
+\\
+The observed mean of the z-values being close to 0 suggests that, on average, the model's predictions are unbiased. However, the slightly higher SD, albeit still near 1, hints at a potential slight overdispersion in the predictions compared to the expected variance in a perfectly calibrated model. Despite this minor deviation, the results remain reasonably close to the ideal targets, indicating that the model is reasonably well calibrated, though not perfectly so.}
+
+\item[(ii)]
+
+Is the predictive Normal qqplot of the $z_i$ close to its target shape under the Poisson $[ SM ]$? Explain briefly. \bi{[10 points]}
+
+\textcolor{blue}{The predictive Normal quantile-quantile plot of the \(z_i\) values, as outlined in the document, reveals that the points closely follow the reference line. This alignment implies a strong resemblance between the distribution of residuals (i.e., the differences between observed and predicted values) and a normal distribution, as expected under the Poisson model. Thus, it suggests that the model's assumptions regarding the data and error structure are reasonably satisfied.}
+
+\end{itemize}
+
+\item[(n)]
+
+Finally, given the bootstrap results and the Bayesian findings with a $[ LI ]$ prior, in this case does it appear that we were able to get away with the cheating approach to $[ SM ]$ specification without having to pay a calibration price? Explain briefly. \bi{[10 points]}
+
+\textcolor{blue}{Taking into account both the bootstrap outcomes and the Bayesian analysis with a Laplace prior, it seems that employing the "cheating" approach to Statistical Model (SM) specification did not lead to a substantial calibration penalty. The evaluation of predictive performance and calibration metrics indicates that the model offered reasonable estimates and predictions, maintaining calibration despite the simplified or "cheated" specification approach. This suggests that, in this instance, the model exhibited resilience to the specification decisions made, enabling effective inference without sacrificing calibration quality.}
+
+\end{itemize}
+
+\end{document}
+
